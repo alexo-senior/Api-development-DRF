@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404#trae los datos o muestra errror 404
 from django.http import JsonResponse
 from students.models import Students
 from .serializers import StudentSerializer
@@ -11,7 +11,7 @@ from employees.models import Employee
 from .serializers import EmployeeSerializer
 from django.http import Http404
 #PARA LOS MIXIN
-from rest_framework import mixins, generics
+from rest_framework import mixins, generics, viewsets
 
 
 #VISTAS BASADAS EN FUNCIONES
@@ -108,31 +108,89 @@ class EmployeeDetails(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
     """
     
-    
-class Employees(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
-    queryset = Employee.objects.all()#conjunro de consultas
-    serializer_class = EmployeeSerializer
-    
-    #obtner la lista de todos los empleados
-    def get(self, request):
-        return self.list(request)
-    #crear un nuevo empleado
-    def post(self, request):
-        return self.create(request)
-    
-    #recupera la informacion con la clave primaria o id y por put la actualiza
-class EmployeeDetails(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin, generics.GenericAPIView):
+    #METODOS CON MIXINS, SIMPLIFICA CODIGO YA QUE ENCAPSULA LOS METODOS CRUD
+    #sin embargo aun se tiene que escribir las funciones con los metodos normales
+    #como los son get, post, el retrieve,put y el delete
+""""""
+
+#GENERICS
+#la clase se debe colocar con un nombre diferente al importado desde employees.model
+#la cual es Employee, es decir no puede tener el mismo nombre de la clase importada
+#usando CreateAPIView se renderiza un formulario para post y aparece en la web
+
+#Listar y crear
+"""class Employees(generics.ListAPIView, generics.CreateAPIView):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
-    def get(self, request, pk):
-        return self.retrieve(request, pk)#recupera o muestra un solo item
     
-    #actualiza la informacion por medio del id
-    def put(self, request, pk):
-        return self.update(request, pk)
     
+#Retrieve(recuperar un objeto), actualizar y borrar    
+class EmployeeDetails(generics.RetrieveAPIView, generics.UpdateAPIView, generics.DestroyAPIView):
+    queryset =Employee.objects.all()
+    serializer_class = EmployeeSerializer
+    lookup_field = 'pk'  #con solo eso se habilita para buscar por pk
+"""
+
+
+#listar objetos con Viewset
+class EmployeeViewset(viewsets.ViewSet):
+    def list(self, request):
+        queryset = Employee.objects.all()
+        serializer = EmployeeSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    #Crear con Viewset
+    def create(self, request):
+        serializer = EmployeeSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def retrieve(self, request, pk=None):
+        employee = get_object_or_404(Employee, pk=pk)
+        serializer = EmployeeSerializer(employee)
+        return Response(serializer.data, status=status.HTTP_200_OK)
         
-    def delete(self, request, pk):
-        return self.destroy(request, pk)
+    
+    
+    def update(self, request, pk=None):
+        employee = get_object_or_404(Employee, pk=pk)
+        serializer = EmployeeSerializer(employee, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+    
+    
+    def delete(self, request, pk=None):
+        employee = get_object_or_404(Employee, pk=pk)
+        employee.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+                        
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+    
+
+    
+    
     
     
