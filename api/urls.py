@@ -7,7 +7,7 @@ router = DefaultRouter()
 #router se encargara de manejar todas las operaciones del crud
 #registrar para la ruta de la app que manejara, sin barras
 
-router.register('employee', views.EmployeeViewset, basename='employee')
+router.register('employee', views.EmployeeViewSet, basename='employee')
 
 
 urlpatterns = [
@@ -19,7 +19,10 @@ urlpatterns = [
     #path('employees/<int:pk>/', views.EmployeeDetails.as_view()),#para usar con clave o id
     
     #inclusionde las rutas del Router
-    path('', include(router.urls))
+    path('', include(router.urls)),
+    
+    path('blogs/', views.BlogsView.as_view()),
+    path('comments/', views.CommentsView.as_view())
 ]
 
 
