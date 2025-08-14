@@ -203,8 +203,9 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     
     
 #se pueden usar  ApiView, o Mixins, pero esta vez se usara generics 
-#para manejar el listado 
-class BlogsView(generics. ListCreateAPIView):
+#para manejar el listado
+
+class BlogsView(generics.ListCreateAPIView):
     queryset = Blog.objects.all()
     serializer_class = BlogSerializer
     
@@ -213,6 +214,29 @@ class CommentsView(generics.ListCreateAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     
+
+
+#se pueden ver los comentarios usando el id, esto debido a que 
+#el serializador se configuro anidado dentro del blog
+class CommentsDetailsView(generics.ListCreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    
+    
+#esta clase se encarga de hacer todas las operaciones
+#tales como recuperar, actualizar y borrar 
+
+class BlogsDetailsView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Blog.objects.all()
+    serializer_class = BlogSerializer
+    lookup_field = 'pk'
+    
+    
+    
+class CommentsDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    lookup_field = 'pk'
     
     
     
