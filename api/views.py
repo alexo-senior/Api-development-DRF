@@ -15,6 +15,9 @@ from rest_framework import mixins, generics, viewsets
 #Para los anidados 
 from blogs.models import Blog, Comment
 from blogs.serializers import BlogSerializer, CommentSerializer
+#from rest_framework.renderers import JSONRenderer
+from .pagination import CustomPagination
+
 
 
 #VISTAS BASADAS EN FUNCIONES
@@ -200,7 +203,7 @@ class EmployeeViewset(viewsets.ViewSet):
 class EmployeeViewSet(viewsets.ModelViewSet):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
-    
+    pagination_class = CustomPagination
     
 #se pueden usar  ApiView, o Mixins, pero esta vez se usara generics 
 #para manejar el listado
@@ -208,6 +211,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
 class BlogsView(generics.ListCreateAPIView):
     queryset = Blog.objects.all()
     serializer_class = BlogSerializer
+    
     
     
 class CommentsView(generics.ListCreateAPIView):
@@ -237,6 +241,9 @@ class CommentsDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     lookup_field = 'pk'
+    
+    
+    
     
     
     
